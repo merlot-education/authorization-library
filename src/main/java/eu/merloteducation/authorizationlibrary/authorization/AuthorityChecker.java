@@ -9,7 +9,7 @@ import java.util.Set;
 
 @Component("authorityChecker")
 public class AuthorityChecker {
-    protected Set<String> getRepresentedOrgaIds(Authentication authentication) {
+    public Set<String> getRepresentedOrgaIds(Authentication authentication) {
         Set<String> representedOrgaIds = new HashSet<>();
         for (GrantedAuthority authority : authentication.getAuthorities()) {
             if (authority instanceof OrganizationRoleGrantedAuthority orgaRoleAuthority) {
