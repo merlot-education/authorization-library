@@ -16,15 +16,15 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
-@Component
+@Component("jwtAuthConverter")
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
-    private final JwtAuthConverterProperties properties;
+    private final JwtAuthConverterProperties jwtAuthConverterProperties;
 
-    public JwtAuthConverter(JwtAuthConverterProperties properties) {
-        this.properties = properties;
+    public JwtAuthConverter(JwtAuthConverterProperties jwtAuthConverterProperties) {
+        this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
     @Override
@@ -37,8 +37,8 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
 
     private String getPrincipalClaimName(Jwt jwt) {
         String claimName = JwtClaimNames.SUB;
-        if (properties.getPrincipalAttribute() != null) {
-            claimName = properties.getPrincipalAttribute();
+        if (jwtAuthConverterProperties.getPrincipalAttribute() != null) {
+            claimName = jwtAuthConverterProperties.getPrincipalAttribute();
         }
         return jwt.getClaim(claimName);
     }

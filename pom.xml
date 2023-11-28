@@ -62,11 +62,18 @@
 			<version>1.18.28</version>
 			<scope>compile</scope>
 		</dependency>
+
 		<dependency>
 			<groupId>org.jetbrains</groupId>
 			<artifactId>annotations</artifactId>
 			<version>13.0</version>
 			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.jacoco</groupId>
+			<artifactId>jacoco-maven-plugin</artifactId>
+			<version>0.8.10</version>
 		</dependency>
 	</dependencies>
 
@@ -111,5 +118,4 @@
 			<url>https://maven.pkg.github.com/merlot-education/authorization-library</url>
 		</repository>
 	</distributionManagement>
-
 </project>

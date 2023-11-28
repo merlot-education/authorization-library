@@ -10,7 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ResponseStatusException;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-@Component
+@Component("activeRoleHeaderHandlerInterceptor")
 public class ActiveRoleHeaderHandlerInterceptor implements HandlerInterceptor {
 
     @Autowired
