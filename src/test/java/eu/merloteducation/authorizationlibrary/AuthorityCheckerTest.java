@@ -22,6 +22,26 @@ public class AuthorityCheckerTest {
     AuthorityChecker authorityChecker;
 
     @Test
+    void getAdministratedOrgaIdsCorrectly() {
+
+        Set<String> actual = authorityChecker.getAdministratedOrgaIds(getTestAuthentication());
+
+        assertThat(actual).containsExactly("30");
+    }
+
+    @Test
+    void administratesOrganizationTrue(){
+        assertThat(authorityChecker.administratesOrganization(getTestAuthentication(), "Participant:30")).isTrue();
+        assertThat(authorityChecker.administratesOrganization(getTestAuthentication(), "30")).isTrue();
+    }
+
+    @Test
+    void administratesOrganizationFalse(){
+        assertThat(authorityChecker.administratesOrganization(getTestAuthentication(), "Participant:10")).isFalse();
+        assertThat(authorityChecker.administratesOrganization(getTestAuthentication(), "20")).isFalse();
+    }
+
+    @Test
     void getRepresentedOrgaIdsCorrectly() {
 
         Set<String> actual = authorityChecker.getRepresentedOrgaIds(getTestAuthentication());
@@ -50,6 +70,7 @@ public class AuthorityCheckerTest {
                 List<OrganizationRoleGrantedAuthority> list = new ArrayList<>();
                 list.add(new OrganizationRoleGrantedAuthority("OrgLegRep_10"));
                 list.add(new OrganizationRoleGrantedAuthority("OrgLegRep_20"));
+                list.add(new OrganizationRoleGrantedAuthority("FedAdmin_30"));
                 return list;
             }
 
