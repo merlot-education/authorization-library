@@ -678,7 +678,7 @@ public class ActiveRoleHeaderHandlerInterceptorTest {
 
                 List<OrganizationRoleGrantedAuthority> list = new ArrayList<>();
                 list.add(new OrganizationRoleGrantedAuthority("OrgLegRep_10"));
-                list.add(new OrganizationRoleGrantedAuthority("OrgRep_20"));
+                list.add(new OrganizationRoleGrantedAuthority("OrgLegRep_20"));
                 return list;
             }
 
