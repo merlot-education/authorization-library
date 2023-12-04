@@ -11,7 +11,8 @@ public class OrganizationRoleGrantedAuthority implements GrantedAuthority {
 
     public OrganizationRoleGrantedAuthority(String authorityString) {
         String[] roleSplit = authorityString.split("_");
-        if (roleSplit[0].equals("OrgRep") || roleSplit[0].equals("OrgLegRep")) {
+        if (roleSplit[0].equals(OrganizationRole.ORG_LEG_REP.getRoleName()) ||
+                roleSplit[0].equals(OrganizationRole.FED_ADMIN.getRoleName())) {
             this.organizationRole = roleSplit[0];
             this.organizationId = authorityString.replace(this.organizationRole + "_", "");
         } else {
@@ -22,5 +23,9 @@ public class OrganizationRoleGrantedAuthority implements GrantedAuthority {
     @Override
     public String getAuthority() {
         return "ROLE_" + organizationRole + "_" + organizationId;
+    }
+
+    public boolean isRepresentative() {
+        return this.organizationRole.equals(OrganizationRole.ORG_LEG_REP.getRoleName());
     }
 }

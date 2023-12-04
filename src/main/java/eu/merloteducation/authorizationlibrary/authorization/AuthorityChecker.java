@@ -12,7 +12,8 @@ public class AuthorityChecker {
     public Set<String> getRepresentedOrgaIds(Authentication authentication) {
         Set<String> representedOrgaIds = new HashSet<>();
         for (GrantedAuthority authority : authentication.getAuthorities()) {
-            if (authority instanceof OrganizationRoleGrantedAuthority orgaRoleAuthority) {
+            if (authority instanceof OrganizationRoleGrantedAuthority orgaRoleAuthority &&
+                    orgaRoleAuthority.isRepresentative()) {
                 representedOrgaIds.add(orgaRoleAuthority.getOrganizationId());
             }
         }
