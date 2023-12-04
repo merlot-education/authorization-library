@@ -28,4 +28,8 @@ public class OrganizationRoleGrantedAuthority implements GrantedAuthority {
     public boolean isRepresentative() {
         return this.organizationRole.equals(OrganizationRole.ORG_LEG_REP.getRoleName());
     }
+
+    public boolean isFedAdmin() {
+        return this.organizationRole.equals(OrganizationRole.FED_ADMIN.getRoleName());
+    }
 }

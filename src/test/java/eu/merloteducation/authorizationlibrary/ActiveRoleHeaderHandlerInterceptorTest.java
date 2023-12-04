@@ -48,16 +48,26 @@ public class ActiveRoleHeaderHandlerInterceptorTest {
         assertThat(
             activeRoleHeaderHandlerInterceptor.preHandle(getTestHttpServletRequest("OrgLegRep_10"), getTestHttpServletResponse(),
                 new Object())).isTrue();
+
+        assertThat(
+            activeRoleHeaderHandlerInterceptor.preHandle(getTestHttpServletRequest("FedAdmin_30"), getTestHttpServletResponse(),
+                new Object())).isTrue();
     }
 
     @Test
     void preHandleFalse() {
 
-        Exception e = assertThrows(ResponseStatusException.class,
+        Exception e1 = assertThrows(ResponseStatusException.class,
             () ->activeRoleHeaderHandlerInterceptor.preHandle(getTestHttpServletRequest("OrgLegRep_30"), getTestHttpServletResponse(),
                 new Object()));
 
-        assertThat(e.getMessage()).isEqualTo(HttpStatus.FORBIDDEN.toString());
+        assertThat(e1.getMessage()).isEqualTo(HttpStatus.FORBIDDEN.toString());
+
+        Exception e2 = assertThrows(ResponseStatusException.class,
+            () ->activeRoleHeaderHandlerInterceptor.preHandle(getTestHttpServletRequest("FedAdmin_10"), getTestHttpServletResponse(),
+                new Object()));
+
+        assertThat(e2.getMessage()).isEqualTo(HttpStatus.FORBIDDEN.toString());
     }
 
     HttpServletRequest getTestHttpServletRequest(String activeRole) {
@@ -679,6 +689,7 @@ public class ActiveRoleHeaderHandlerInterceptorTest {
                 List<OrganizationRoleGrantedAuthority> list = new ArrayList<>();
                 list.add(new OrganizationRoleGrantedAuthority("OrgLegRep_10"));
                 list.add(new OrganizationRoleGrantedAuthority("OrgLegRep_20"));
+                list.add(new OrganizationRoleGrantedAuthority("FedAdmin_30"));
                 return list;
             }
 
