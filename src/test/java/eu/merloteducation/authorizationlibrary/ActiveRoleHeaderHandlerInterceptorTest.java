@@ -28,7 +28,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SpringBootTest(classes = { ActiveRoleHeaderHandlerInterceptor.class , AuthorityChecker.class })
-public class ActiveRoleHeaderHandlerInterceptorTest {
+class ActiveRoleHeaderHandlerInterceptorTest {
 
     @Autowired
     ActiveRoleHeaderHandlerInterceptor activeRoleHeaderHandlerInterceptor;

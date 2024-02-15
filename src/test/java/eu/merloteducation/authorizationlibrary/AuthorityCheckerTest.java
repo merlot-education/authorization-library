@@ -16,7 +16,7 @@ import java.util.Set;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBootTest(classes = { AuthorityChecker.class })
-public class AuthorityCheckerTest {
+class AuthorityCheckerTest {
 
     @Autowired
     AuthorityChecker authorityChecker;
