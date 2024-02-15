@@ -1,16 +1,19 @@
 package eu.merloteducation.authorizationlibrary.authorization;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
+import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.stereotype.Component;
 
 import java.util.Collection;
-import java.util.Map;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -18,20 +21,23 @@ import java.util.stream.Stream;
 @Component("jwtAuthConverter")
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
+    private OpaqueTokenIntrospector opaqueTokenIntrospector;
+
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
     private final JwtAuthConverterProperties jwtAuthConverterProperties;
 
-    public JwtAuthConverter(JwtAuthConverterProperties jwtAuthConverterProperties) {
-
+    public JwtAuthConverter(@Autowired OpaqueTokenIntrospector opaqueTokenIntrospector,
+                            @Autowired JwtAuthConverterProperties jwtAuthConverterProperties) {
+        this.opaqueTokenIntrospector = opaqueTokenIntrospector;
         this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
-
+        OAuth2AuthenticatedPrincipal principal = opaqueTokenIntrospector.introspect(jwt.getTokenValue());
         Collection<GrantedAuthority> authorities = Stream.concat(jwtGrantedAuthoritiesConverter.convert(jwt).stream(),
-            extractResourceRoles(jwt).stream()).collect(Collectors.toSet());
+            extractResourceRoles(principal).stream()).collect(Collectors.toSet());
         return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
     }
 
@@ -44,16 +50,11 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
         return jwt.getClaim(claimName);
     }
 
-    private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt) {
-
-        Map<String, Object> resourceAccess = jwt.getClaim("realm_access");
-        Collection<String> resourceRoles;
-        if (resourceAccess == null || (resourceRoles = (Collection<String>) resourceAccess.get("roles")) == null) {
-            return Set.of();
+    private Collection<? extends GrantedAuthority> extractResourceRoles(OAuth2AuthenticatedPrincipal principal) {
+        if (principal == null) {
+            return Collections.emptySet();
         }
-        return resourceRoles.stream().filter(
-                s -> s.startsWith(OrganizationRole.FED_ADMIN.getRoleName()) || s.startsWith(
-                    OrganizationRole.ORG_LEG_REP.getRoleName())).map(OrganizationRoleGrantedAuthority::new)
-            .collect(Collectors.toSet());
+        return Set.of(new OrganizationRoleGrantedAuthority(
+                principal.getAttribute("Role") + "_" + principal.getAttribute("issuerDID")));
     }
 }
