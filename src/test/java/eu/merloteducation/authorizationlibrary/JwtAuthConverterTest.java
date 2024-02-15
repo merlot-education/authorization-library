@@ -33,7 +33,10 @@ class JwtAuthConverterTest {
     @Test
     void convertJwt() {
         when(opaqueTokenIntrospector.introspect(any()))
-                .thenReturn(new OAuth2IntrospectionAuthenticatedPrincipal(Map.of("Role", "dataport"), null));
+                .thenReturn(new OAuth2IntrospectionAuthenticatedPrincipal(
+                        Map.of("Role", "OrgLegRep",
+                                "issuerDID","did:web:marketplace.dev.merlot-education.eu#14e2471b-a276-3349-8a6e-caa941f9369b"),
+                        null));
         Jwt jwt = new Jwt("someValue", Instant.now(), Instant.now().plusSeconds(999), Map.of("header1", "header1"),
             Map.of("sub", "myUserId"));
         Authentication auth = jwtAuthConverter.convert(jwt);

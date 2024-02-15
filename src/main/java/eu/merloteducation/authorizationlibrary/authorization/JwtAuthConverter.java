@@ -54,19 +54,7 @@ public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationTo
         if (principal == null) {
             return Collections.emptySet();
         }
-        // TODO replace this logic once OCM is updated
-        String role = principal.getAttribute("Role");
-        if (role == null) {
-            return Collections.emptySet();
-        }
-        return switch (role) {
-            case "dataport" ->
-                    Set.of(new OrganizationRoleGrantedAuthority("OrgLegRep_did:web:marketplace.dev.merlot-education.eu#14e2471b-a276-3349-8a6e-caa941f9369b"));
-            case "capgemini" ->
-                    Set.of(new OrganizationRoleGrantedAuthority("OrgLegRep_did:web:marketplace.dev.merlot-education.eu#1c092e75-4a75-3746-9c76-a737389e3e49"));
-            case "gaia" ->
-                    Set.of(new OrganizationRoleGrantedAuthority("OrgLegRep_did:web:marketplace.dev.merlot-education.eu#c041ea73-3ecf-3a06-a5cd-919f5cef8e54"));
-            default -> Collections.emptySet();
-        };
+        return Set.of(new OrganizationRoleGrantedAuthority(
+                principal.getAttribute("Role") + "_" + principal.getAttribute("issuerDID")));
     }
 }

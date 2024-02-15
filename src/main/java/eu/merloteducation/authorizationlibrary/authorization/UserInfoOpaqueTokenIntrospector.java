@@ -1,29 +1,44 @@
 package eu.merloteducation.authorizationlibrary.authorization;
 
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.security.oauth2.server.resource.introspection.NimbusOpaqueTokenIntrospector;
 import org.springframework.security.oauth2.server.resource.introspection.OAuth2IntrospectionAuthenticatedPrincipal;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.stereotype.Component;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.reactive.function.client.WebClient;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 @Component
 public class UserInfoOpaqueTokenIntrospector implements OpaqueTokenIntrospector {
 
-    private final String userInfoUri = "https://auth-service.dev.merlot-education.eu/userinfo";
-    private final RestTemplate restTemplate = new RestTemplate();
+    private final String userInfoUri;
+    private final WebClient webClient;
+
+    public UserInfoOpaqueTokenIntrospector(@Autowired WebClient.Builder webClientBuilder,
+                                           @Value("${spring.security.oauth2.resourceserver.jwt.userinfo-uri:#{null}}") String userInfoUri) {
+        this.webClient = webClientBuilder.build();
+        this.userInfoUri = userInfoUri;
+    }
 
     @Override
     public OAuth2AuthenticatedPrincipal introspect(String token) {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setBearerAuth(token);
-        Map<String, Object> claims = restTemplate.exchange(userInfoUri, HttpMethod.GET, new HttpEntity<>(headers), Map.class).getBody();
+        Map<String, Object> claims = webClient
+                .get()
+                .uri(userInfoUri)
+                .headers(h -> h.setBearerAuth(token))
+                .retrieve()
+                .bodyToMono(new ParameterizedTypeReference<Map<String, Object>>() {})
+                .block();
+
+        if (claims == null || claims.isEmpty()) {
+            return new OAuth2IntrospectionAuthenticatedPrincipal(Collections.emptyMap(), List.of());
+        }
+
         return new OAuth2IntrospectionAuthenticatedPrincipal(claims, List.of());
     }
 }
