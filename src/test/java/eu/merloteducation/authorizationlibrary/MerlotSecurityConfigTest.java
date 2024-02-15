@@ -1,8 +1,6 @@
 package eu.merloteducation.authorizationlibrary;
 
 import eu.merloteducation.authorizationlibrary.authorization.JwtAuthConverter;
-import eu.merloteducation.authorizationlibrary.authorization.JwtAuthConverterProperties;
-import eu.merloteducation.authorizationlibrary.authorization.UserInfoOpaqueTokenIntrospector;
 import eu.merloteducation.authorizationlibrary.config.MerlotSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -12,27 +10,26 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.web.reactive.function.client.WebClient;
 
 import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
-@SpringBootTest(classes = {MerlotSecurityConfig.class, JwtAuthConverter.class, JwtAuthConverterProperties.class, UserInfoOpaqueTokenIntrospector.class})
+@SpringBootTest(classes = {MerlotSecurityConfig.class})
 class MerlotSecurityConfigTest {
 
     @Autowired
     private MerlotSecurityConfig merlotSecurityConfig;
 
     @MockBean
-    private WebClient.Builder webClientBuilder;
+    private JwtAuthConverter jwtAuthConverter;
 
     @Test
     void checkSecuritySetupMethodsAreCalled() throws Exception {
         HttpSecurity security = mock(HttpSecurity.class);
         merlotSecurityConfig.applySecurityConfig(security);
-        verify(security, times(1)).oauth2ResourceServer(any());
-        verify(security, times(1)).sessionManagement(any());
-        verify(security, times(1)).cors(Customizer.withDefaults());
-        verify(security, times(1)).headers(any());
+        verify(security, times(1)).oauth2ResourceServer(any());// ensure oauth config was called
+        verify(security, times(1)).sessionManagement(any()); // session management activated
+        verify(security, times(1)).cors(Customizer.withDefaults()); // default CORS
+        verify(security, times(1)).headers(any()); // default CORS
     }
 }
