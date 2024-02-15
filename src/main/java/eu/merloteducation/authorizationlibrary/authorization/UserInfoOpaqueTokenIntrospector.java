@@ -36,7 +36,7 @@ public class UserInfoOpaqueTokenIntrospector implements OpaqueTokenIntrospector 
                 .block();
 
         if (claims == null || claims.isEmpty()) {
-            return new OAuth2IntrospectionAuthenticatedPrincipal(Collections.emptyMap(), List.of());
+            return null;
         }
 
         return new OAuth2IntrospectionAuthenticatedPrincipal(claims, List.of());

@@ -1,58 +1,49 @@
 package eu.merloteducation.authorizationlibrary;
 
+import com.github.tomakehurst.wiremock.junit5.WireMockTest;
 import eu.merloteducation.authorizationlibrary.authorization.UserInfoOpaqueTokenIntrospector;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
+import static com.github.tomakehurst.wiremock.client.WireMock.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-import java.util.Map;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.lenient;
-
+@SpringBootTest
 @ExtendWith(MockitoExtension.class)
+@EnableConfigurationProperties
+@WireMockTest(httpPort = 8102)
 class UserInfoOpaqueTokenIntrospectorTest {
 
+    @Autowired
     private UserInfoOpaqueTokenIntrospector userInfoOpaqueTokenIntrospector;
 
-    @Mock
+    @Autowired
     private WebClient.Builder webClientBuilder;
-
-    @Mock
-    private WebClient webClient;
-
-    @Mock
-    WebClient.RequestHeadersUriSpec requestHeadersUriSpec;
-
-    @Mock
-    WebClient.RequestBodySpec requestBodySpec;
-
-    @Mock
-    WebClient.ResponseSpec responseSpec;
-
-    @BeforeEach
-    public void setUp() {
-        lenient().when(webClient.get()).thenReturn(requestHeadersUriSpec);
-        lenient().when(requestHeadersUriSpec.uri(anyString())).thenReturn(requestBodySpec);
-        lenient().when(requestBodySpec.headers(any())).thenReturn(requestBodySpec);
-        lenient().when(requestBodySpec.retrieve()).thenReturn(responseSpec);
-        lenient().when(responseSpec.bodyToMono(eq(new ParameterizedTypeReference<Map<String, Object>>(){})))
-                .thenReturn(Mono.just(Map.of("some", "value")));
-
-        lenient().when(webClientBuilder.build()).thenReturn(webClient);
-        this.userInfoOpaqueTokenIntrospector = new UserInfoOpaqueTokenIntrospector(webClientBuilder, "someuri");
-    }
 
     @Test
     void getUserInfoClaimsSuccessful() {
+        stubFor(get("/userinfo")
+                .willReturn(ok()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{\"some\": \"data\"}")));
+
         OAuth2AuthenticatedPrincipal principal = this.userInfoOpaqueTokenIntrospector.introspect("1234");
-        assertEquals("value", principal.getAttribute("some"));
+        assertEquals("data", principal.getAttribute("some"));
+    }
+
+    @Test
+    void getUserInfoClaimsEmpty() {
+        stubFor(get("/userinfo")
+                .willReturn(ok()
+                        .withHeader("Content-Type", "application/json")
+                        .withBody("{}")));
+
+        OAuth2AuthenticatedPrincipal principal = this.userInfoOpaqueTokenIntrospector.introspect("1234");
+        assertNull(principal);
     }
 }
