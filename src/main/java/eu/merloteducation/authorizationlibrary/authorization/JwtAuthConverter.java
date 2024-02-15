@@ -21,15 +21,15 @@ import java.util.stream.Stream;
 @Component("jwtAuthConverter")
 public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
-    @Autowired
     private OpaqueTokenIntrospector opaqueTokenIntrospector;
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
 
     private final JwtAuthConverterProperties jwtAuthConverterProperties;
 
-    public JwtAuthConverter(JwtAuthConverterProperties jwtAuthConverterProperties) {
-
+    public JwtAuthConverter(@Autowired OpaqueTokenIntrospector opaqueTokenIntrospector,
+                            @Autowired JwtAuthConverterProperties jwtAuthConverterProperties) {
+        this.opaqueTokenIntrospector = opaqueTokenIntrospector;
         this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
