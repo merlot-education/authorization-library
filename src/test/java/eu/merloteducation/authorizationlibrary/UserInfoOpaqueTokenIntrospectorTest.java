@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
-import org.springframework.web.reactive.function.client.WebClient;
 import static com.github.tomakehurst.wiremock.client.WireMock.*;
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -21,9 +20,6 @@ class UserInfoOpaqueTokenIntrospectorTest {
 
     @Autowired
     private UserInfoOpaqueTokenIntrospector userInfoOpaqueTokenIntrospector;
-
-    @Autowired
-    private WebClient.Builder webClientBuilder;
 
     @Test
     void getUserInfoClaimsSuccessful() {
