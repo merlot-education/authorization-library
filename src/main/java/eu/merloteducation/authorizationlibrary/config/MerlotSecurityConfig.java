@@ -1,7 +1,7 @@
 package eu.merloteducation.authorizationlibrary.config;
 
 import eu.merloteducation.authorizationlibrary.authorization.JwtAuthConverter;
-import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer;
@@ -9,9 +9,12 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.stereotype.Component;
 
 @Component
-@RequiredArgsConstructor
 public class MerlotSecurityConfig {
     private final JwtAuthConverter jwtAuthConverter;
+
+    public MerlotSecurityConfig(@Autowired JwtAuthConverter jwtAuthConverter) {
+        this.jwtAuthConverter = jwtAuthConverter;
+    }
 
     /**
      * Given an instance of the HttpSecurity, apply the common security configurations of project MERLOT.

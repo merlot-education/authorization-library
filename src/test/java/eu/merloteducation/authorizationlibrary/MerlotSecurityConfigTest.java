@@ -1,6 +1,6 @@
 package eu.merloteducation.authorizationlibrary;
 
-import eu.merloteducation.authorizationlibrary.authorization.JwtAuthConverter;
+import eu.merloteducation.authorizationlibrary.authorization.SsiJwtAuthConverter;
 import eu.merloteducation.authorizationlibrary.config.MerlotSecurityConfig;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -21,7 +21,7 @@ class MerlotSecurityConfigTest {
     private MerlotSecurityConfig merlotSecurityConfig;
 
     @MockBean
-    private JwtAuthConverter jwtAuthConverter;
+    private SsiJwtAuthConverter ssiJwtAuthConverter;
 
     @Test
     void checkSecuritySetupMethodsAreCalled() throws Exception {
