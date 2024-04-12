@@ -18,28 +18,19 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(name = "jwt-auth-converter", havingValue = "keycloakJwtAuthConverter")
 public class KeycloakJwtAuthConverter implements JwtAuthConverter {
 
-    private final JwtAuthConverterProperties jwtAuthConverterProperties;
+    public KeycloakJwtAuthConverter() {
 
-    public KeycloakJwtAuthConverter(@Autowired JwtAuthConverterProperties jwtAuthConverterProperties) {
-        this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         Collection<GrantedAuthority> authorities = extractResourceRoles(jwt);
 
-        String fullName =  jwt.getClaim("name");
-
-        return new MerlotAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt), fullName);
+        return new JwtAuthenticationToken(jwt, authorities, getFullName(jwt));
     }
 
-    private String getPrincipalClaimName(Jwt jwt) {
-
-        String claimName = JwtClaimNames.SUB;
-        if (jwtAuthConverterProperties.getPrincipalAttribute() != null) {
-            claimName = jwtAuthConverterProperties.getPrincipalAttribute();
-        }
-        return jwt.getClaim(claimName);
+    private String getFullName(Jwt jwt) {
+        return jwt.getClaim("name");
     }
 
     @SuppressWarnings("unchecked")

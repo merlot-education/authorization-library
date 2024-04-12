@@ -1,5 +1,6 @@
 package eu.merloteducation.authorizationlibrary.authorization;
 
+import org.jetbrains.annotations.NotNull;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -21,12 +22,8 @@ public class SsiJwtAuthConverter implements JwtAuthConverter {
 
     private final OpaqueTokenIntrospector opaqueTokenIntrospector;
 
-    private final JwtAuthConverterProperties jwtAuthConverterProperties;
-
-    public SsiJwtAuthConverter(@Autowired OpaqueTokenIntrospector opaqueTokenIntrospector,
-                               @Autowired JwtAuthConverterProperties jwtAuthConverterProperties) {
+    public SsiJwtAuthConverter(@Autowired OpaqueTokenIntrospector opaqueTokenIntrospector) {
         this.opaqueTokenIntrospector = opaqueTokenIntrospector;
-        this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
     @Override
@@ -34,23 +31,11 @@ public class SsiJwtAuthConverter implements JwtAuthConverter {
         OAuth2AuthenticatedPrincipal principal = opaqueTokenIntrospector.introspect(jwt.getTokenValue());
         Collection<GrantedAuthority> authorities = extractResourceRoles(principal);
 
-        String fullName = principal == null ? "" : principal.getAttribute("Vorname") + " " + principal.getAttribute("Nachname");
-
-        return new MerlotAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt, principal), fullName);
+        return new JwtAuthenticationToken(jwt, authorities, getFullName(principal));
     }
 
-    private String getPrincipalClaimName(Jwt jwt, OAuth2AuthenticatedPrincipal principal) {
-
-        String claimName = JwtClaimNames.SUB;
-        if (jwtAuthConverterProperties.getPrincipalAttribute() != null) {
-            claimName = jwtAuthConverterProperties.getPrincipalAttribute();
-        }
-
-        if (!jwt.hasClaim(claimName)) {
-            return principal == null ? "" : principal.getAttribute("ID");
-        }
-
-        return jwt.getClaim(claimName);
+    private String getFullName(OAuth2AuthenticatedPrincipal principal) {
+        return principal == null ? "" : principal.getAttribute("Vorname") + " " + principal.getAttribute("Nachname");
     }
 
     private Collection<GrantedAuthority> extractResourceRoles(OAuth2AuthenticatedPrincipal principal) {
