@@ -33,15 +33,23 @@ public class SsiJwtAuthConverter implements JwtAuthConverter {
     public AbstractAuthenticationToken convert(Jwt jwt) {
         OAuth2AuthenticatedPrincipal principal = opaqueTokenIntrospector.introspect(jwt.getTokenValue());
         Collection<GrantedAuthority> authorities = extractResourceRoles(principal);
-        return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
+
+        String fullName = principal == null ? "" : principal.getAttribute("Vorname") + " " + principal.getAttribute("Nachname");
+
+        return new MerlotAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt, principal), fullName);
     }
 
-    private String getPrincipalClaimName(Jwt jwt) {
+    private String getPrincipalClaimName(Jwt jwt, OAuth2AuthenticatedPrincipal principal) {
 
         String claimName = JwtClaimNames.SUB;
         if (jwtAuthConverterProperties.getPrincipalAttribute() != null) {
             claimName = jwtAuthConverterProperties.getPrincipalAttribute();
         }
+
+        if (!jwt.hasClaim(claimName)) {
+            return principal == null ? "" : principal.getAttribute("ID");
+        }
+
         return jwt.getClaim(claimName);
     }
 

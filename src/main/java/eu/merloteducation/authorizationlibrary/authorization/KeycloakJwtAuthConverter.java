@@ -27,7 +27,10 @@ public class KeycloakJwtAuthConverter implements JwtAuthConverter {
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         Collection<GrantedAuthority> authorities = extractResourceRoles(jwt);
-        return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
+
+        String fullName =  jwt.getClaim("name");
+
+        return new MerlotAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt), fullName);
     }
 
     private String getPrincipalClaimName(Jwt jwt) {
