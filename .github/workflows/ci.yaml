@@ -28,7 +28,7 @@ jobs:
         if: startsWith(github.ref, 'refs/heads/')
         shell: bash {0}
         run: |
-          tag="$(grep -oPm1 '(?<=<version>)[^<]+' pom.xml)-$(git rev-parse --short HEAD)"
+          tag="$(grep -oPm1 '(?<=<version>)[^<]+' pom.xml)"
           echo "tag=$tag" >> $GITHUB_ENV
           echo "environment=dev" >> $GITHUB_ENV
 
