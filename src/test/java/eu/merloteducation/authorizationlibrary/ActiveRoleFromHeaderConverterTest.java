@@ -30,6 +30,6 @@ class ActiveRoleFromHeaderConverterTest {
         String authorityString = "SomeRole_10";
         Exception e = assertThrows(IllegalArgumentException.class,
             () -> activeRoleFromHeaderConverter.convert(authorityString));
-        assertThat(e.getMessage()).startsWith("No enum constant");
+        assertThat(e.getMessage()).startsWith("No role with this name found.");
     }
 }

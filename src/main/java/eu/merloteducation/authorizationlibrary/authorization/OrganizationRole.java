@@ -2,8 +2,11 @@ package eu.merloteducation.authorizationlibrary.authorization;
 
 import lombok.Getter;
 
+import java.util.Arrays;
 import java.util.EnumSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 @Getter
@@ -12,6 +15,10 @@ public enum OrganizationRole {
     FED_ADMIN("FedAdmin");
 
     private final String roleName;
+
+    private static final Map<String, OrganizationRole> roleNameMap = Arrays.stream(OrganizationRole.values())
+            .collect(Collectors.toMap(OrganizationRole::getRoleName, Function.identity()));
+
     OrganizationRole(String roleName) {
         this.roleName = roleName;
     }
@@ -35,11 +42,10 @@ public enum OrganizationRole {
      * @return role object
      */
     public static OrganizationRole getByRoleName(String roleName) {
-        // convert the names (camelCase) to UPPER_SNAKE_CASE
-        String upperSnakeCase = roleName
-                .replaceAll("([A-Z]+)([A-Z][a-z])", "$1_$2")
-                .replaceAll("([a-z])([A-Z])", "$1_$2")
-                .toUpperCase();
-        return OrganizationRole.valueOf(upperSnakeCase);
+        OrganizationRole role = roleNameMap.get(roleName);
+        if (role == null) {
+            throw new IllegalArgumentException("No role with this name found.");
+        }
+        return role;
     }
 }
