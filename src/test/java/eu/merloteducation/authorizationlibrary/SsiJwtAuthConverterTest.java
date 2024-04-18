@@ -22,7 +22,7 @@ import static org.mockito.Mockito.when;
 
 @SpringBootTest(
         properties = "jwt-auth-converter=ssiJwtAuthConverter",
-        classes = { JwtAuthConverter.class, SsiJwtAuthConverter.class, JwtAuthConverterProperties.class }
+        classes = { JwtAuthConverter.class, SsiJwtAuthConverter.class }
 )
 class SsiJwtAuthConverterTest {
 

@@ -1,11 +1,9 @@
 package eu.merloteducation.authorizationlibrary.authorization;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.stereotype.Component;
 
@@ -18,25 +16,19 @@ import java.util.stream.Collectors;
 @ConditionalOnProperty(name = "jwt-auth-converter", havingValue = "keycloakJwtAuthConverter")
 public class KeycloakJwtAuthConverter implements JwtAuthConverter {
 
-    private final JwtAuthConverterProperties jwtAuthConverterProperties;
+    public KeycloakJwtAuthConverter() {
 
-    public KeycloakJwtAuthConverter(@Autowired JwtAuthConverterProperties jwtAuthConverterProperties) {
-        this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         Collection<GrantedAuthority> authorities = extractResourceRoles(jwt);
-        return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
+
+        return new JwtAuthenticationToken(jwt, authorities, getFullName(jwt));
     }
 
-    private String getPrincipalClaimName(Jwt jwt) {
-
-        String claimName = JwtClaimNames.SUB;
-        if (jwtAuthConverterProperties.getPrincipalAttribute() != null) {
-            claimName = jwtAuthConverterProperties.getPrincipalAttribute();
-        }
-        return jwt.getClaim(claimName);
+    private String getFullName(Jwt jwt) {
+        return jwt.getClaim("name");
     }
 
     @SuppressWarnings("unchecked")

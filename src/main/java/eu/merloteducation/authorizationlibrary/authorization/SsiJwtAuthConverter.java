@@ -6,7 +6,6 @@ import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.OAuth2AuthenticatedPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.introspection.OpaqueTokenIntrospector;
 import org.springframework.stereotype.Component;
@@ -21,28 +20,20 @@ public class SsiJwtAuthConverter implements JwtAuthConverter {
 
     private final OpaqueTokenIntrospector opaqueTokenIntrospector;
 
-    private final JwtAuthConverterProperties jwtAuthConverterProperties;
-
-    public SsiJwtAuthConverter(@Autowired OpaqueTokenIntrospector opaqueTokenIntrospector,
-                               @Autowired JwtAuthConverterProperties jwtAuthConverterProperties) {
+    public SsiJwtAuthConverter(@Autowired OpaqueTokenIntrospector opaqueTokenIntrospector) {
         this.opaqueTokenIntrospector = opaqueTokenIntrospector;
-        this.jwtAuthConverterProperties = jwtAuthConverterProperties;
     }
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
         OAuth2AuthenticatedPrincipal principal = opaqueTokenIntrospector.introspect(jwt.getTokenValue());
         Collection<GrantedAuthority> authorities = extractResourceRoles(principal);
-        return new JwtAuthenticationToken(jwt, authorities, getPrincipalClaimName(jwt));
+
+        return new JwtAuthenticationToken(jwt, authorities, getFullName(principal));
     }
 
-    private String getPrincipalClaimName(Jwt jwt) {
-
-        String claimName = JwtClaimNames.SUB;
-        if (jwtAuthConverterProperties.getPrincipalAttribute() != null) {
-            claimName = jwtAuthConverterProperties.getPrincipalAttribute();
-        }
-        return jwt.getClaim(claimName);
+    private String getFullName(OAuth2AuthenticatedPrincipal principal) {
+        return principal == null ? "" : principal.getAttribute("Vorname") + " " + principal.getAttribute("Nachname");
     }
 
     private Collection<GrantedAuthority> extractResourceRoles(OAuth2AuthenticatedPrincipal principal) {

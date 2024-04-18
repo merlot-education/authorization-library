@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @SpringBootTest(
         properties = "jwt-auth-converter=keycloakJwtAuthConverter",
-        classes = { JwtAuthConverter.class, KeycloakJwtAuthConverter.class, JwtAuthConverterProperties.class }
+        classes = { JwtAuthConverter.class, KeycloakJwtAuthConverter.class }
 )
 class KeycloakJwtAuthConverterTest {
 
