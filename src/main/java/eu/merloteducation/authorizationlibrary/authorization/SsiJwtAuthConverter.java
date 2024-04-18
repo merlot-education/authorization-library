@@ -1,5 +1,6 @@
 package eu.merloteducation.authorizationlibrary.authorization;
 
+import io.netty.util.internal.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
@@ -33,14 +34,25 @@ public class SsiJwtAuthConverter implements JwtAuthConverter {
     }
 
     private String getFullName(OAuth2AuthenticatedPrincipal principal) {
-        return principal == null ? "" : principal.getAttribute("Vorname") + " " + principal.getAttribute("Nachname");
+        return principal == null
+                ? ""
+                : principal.getAttribute("Vorname") + " " + principal.getAttribute("Nachname");
     }
 
     private Collection<GrantedAuthority> extractResourceRoles(OAuth2AuthenticatedPrincipal principal) {
         if (principal == null) {
             return Collections.emptySet();
         }
-        return Set.of(new OrganizationRoleGrantedAuthority(
-                principal.getAttribute("Role") + "_" + principal.getAttribute("issuerDID")));
+
+        String role = principal.getAttribute("Role");
+        String orgaId = principal.getAttribute("issuerDID");
+
+        if (StringUtil.isNullOrEmpty(orgaId)
+                || role == null
+                || !OrganizationRole.getAvailableRoles().contains(role)) {
+            return Collections.emptySet();
+        }
+
+        return Set.of(new OrganizationRoleGrantedAuthority(OrganizationRole.getByRoleName(role), orgaId));
     }
 }

@@ -9,16 +9,13 @@ import org.springframework.stereotype.Component;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component("keycloakJwtAuthConverter")
 @ConditionalOnProperty(name = "jwt-auth-converter", havingValue = "keycloakJwtAuthConverter")
 public class KeycloakJwtAuthConverter implements JwtAuthConverter {
-
-    public KeycloakJwtAuthConverter() {
-
-    }
 
     @Override
     public AbstractAuthenticationToken convert(Jwt jwt) {
@@ -39,9 +36,15 @@ public class KeycloakJwtAuthConverter implements JwtAuthConverter {
         if (resourceAccess == null || (resourceRoles = (Collection<String>) resourceAccess.get("roles")) == null) {
             return Set.of();
         }
-        return resourceRoles.stream().filter(
-                        s -> s.startsWith(OrganizationRole.FED_ADMIN.getRoleName()) || s.startsWith(
-                                OrganizationRole.ORG_LEG_REP.getRoleName())).map(OrganizationRoleGrantedAuthority::new)
+
+        return resourceRoles.stream().filter(r -> r.contains("_")).map(r -> {
+                            try {
+                                return new OrganizationRoleGrantedAuthority(r);
+                            } catch (IllegalArgumentException ignored) {
+                                return null;
+                            }
+        })
+                .filter(Objects::nonNull)
                 .collect(Collectors.toSet());
     }
 }

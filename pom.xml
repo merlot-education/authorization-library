@@ -4,7 +4,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>eu.merlot-education</groupId>
 	<artifactId>authorization-library</artifactId>
-	<version>0.0.9</version>
+	<version>0.0.10</version>
 	<name>authorization-library</name>
 	<description>Library for common authorization checks.</description>
 	<url>https://merlot-education.eu/</url>

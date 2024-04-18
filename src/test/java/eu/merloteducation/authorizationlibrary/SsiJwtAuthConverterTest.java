@@ -43,7 +43,7 @@ class SsiJwtAuthConverterTest {
             Map.of("sub", "myUserId"));
         Authentication auth = ssiJwtAuthConverter.convert(jwt);
         List<OrganizationRoleGrantedAuthority> orgaAuths = (List<OrganizationRoleGrantedAuthority>) auth.getAuthorities();
-        assertEquals("OrgLegRep", orgaAuths.get(0).getOrganizationRole());
+        assertEquals("OrgLegRep", orgaAuths.get(0).getOrganizationRole().getRoleName());
         assertEquals("did:web:marketplace.dev.merlot-education.eu#14e2471b-a276-3349-8a6e-caa941f9369b", orgaAuths.get(0).getOrganizationId());
 
     }

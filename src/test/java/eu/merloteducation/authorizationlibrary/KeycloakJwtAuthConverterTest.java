@@ -37,7 +37,7 @@ class KeycloakJwtAuthConverterTest {
                 Map.of("sub", "myUserId", "realm_access", Map.of("roles", Set.of("OrgLegRep_10", "SomeOtherRole"))));
         Authentication auth = keycloakJwtAuthConverter.convert(jwt);
         List<OrganizationRoleGrantedAuthority> orgaAuths = (List<OrganizationRoleGrantedAuthority>) auth.getAuthorities();
-        assertEquals("OrgLegRep", orgaAuths.get(0).getOrganizationRole());
+        assertEquals("OrgLegRep", orgaAuths.get(0).getOrganizationRole().getRoleName());
         assertEquals("10", orgaAuths.get(0).getOrganizationId());
 
     }
