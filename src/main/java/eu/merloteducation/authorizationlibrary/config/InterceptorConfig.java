@@ -24,9 +24,11 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 @Configuration
 public class InterceptorConfig implements WebMvcConfigurer {
+    private final ActiveRoleHeaderHandlerInterceptor activeRoleHeaderHandlerInterceptor;
 
-    @Autowired
-    private ActiveRoleHeaderHandlerInterceptor activeRoleHeaderHandlerInterceptor;
+    public InterceptorConfig(@Autowired ActiveRoleHeaderHandlerInterceptor activeRoleHeaderHandlerInterceptor) {
+        this.activeRoleHeaderHandlerInterceptor = activeRoleHeaderHandlerInterceptor;
+    }
 
     @Override
     public void addInterceptors(final InterceptorRegistry registry) {

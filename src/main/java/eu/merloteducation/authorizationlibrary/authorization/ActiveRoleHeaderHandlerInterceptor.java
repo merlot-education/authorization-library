@@ -29,9 +29,11 @@ import org.springframework.web.servlet.HandlerInterceptor;
 
 @Component("activeRoleHeaderHandlerInterceptor")
 public class ActiveRoleHeaderHandlerInterceptor implements HandlerInterceptor {
+    private final AuthorityChecker authorityChecker;
 
-    @Autowired
-    private AuthorityChecker authorityChecker;
+    public ActiveRoleHeaderHandlerInterceptor(@Autowired AuthorityChecker authorityChecker) {
+        this.authorityChecker = authorityChecker;
+    }
 
     @Override
     public boolean preHandle(HttpServletRequest request, @NotNull HttpServletResponse response,
